@@ -102,9 +102,9 @@ VPATH +=  %.cpp $(SRCDIR)/media/src/$(JSR309DIR)
 INCLUDE+= -I$(SRCDIR)/media/include/ $(GNASHINCLUDE) -I/usr/local/src/live/UsageEnvironment/include/ -I/usr/local/src/live/BasicUsageEnvironment/include/ -I/usr/local/src/live/groupsock/include/ -I/usr/local/src/live/liveMedia/include/
 LDFLAGS+= -L/usr/local/lib -lavcodec -lgsm -lpthread -lswscale -lavformat -lavutil -lx264 -lssl -lmp4v2 -lspeex -lspeexdsp -lcrypto
 LDXMLFLAGS+= -lxmlrpc -lxmlrpc_xmlparse -lxmlrpc_xmltok -lxmlrpc_abyss -lxmlrpc_server -lxmlrpc_util
-LDLIVE555FLAGS+= -L/usr/local/src/live/liveMedia -lliveMedia -L/usr/local/src/live/BasicUsageEnvironment/ -lBasicUsageEnvironment -L/usr/local/src/live/UsageEnvironment/ -lUsageEnvironment -L/usr/local/src/live/groupsock/ -lgroupsock
+#LDLIVE555FLAGS+= -L/usr/local/src/live/liveMedia -lliveMedia -L/usr/local/src/live/BasicUsageEnvironment/ -lBasicUsageEnvironment -L/usr/local/src/live/UsageEnvironment/ -lUsageEnvironment -L/usr/local/src/live/groupsock/ -lgroupsock
 LDFLAGS+= $(LDXMLFLAGS)
-LDFLAGS+= $(LDLIVE555FLAGS)
+#LDFLAGS+= $(LDLIVE555FLAGS)
 
 #For abyss
 OPTS 	+= -D_UNIX -D__STDC_CONSTANT_MACROS -fPIC
