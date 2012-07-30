@@ -28,7 +28,7 @@ AudioStream::AudioStream(RTPSession::Listener* listener) : rtp(listener)
 	audioCodec=AudioCodec::PCMU;
 	// add for rtsp watcher by liuhong start
 	m_Participant = NULL;
-	audioSubsession = NULL;
+	//audioSubsession = NULL;
 	decodeCodec=AudioCodec::PCMU;
 	muted = false;
 	// add for rtsp watcher by liuhong end

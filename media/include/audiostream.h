@@ -30,8 +30,8 @@ public:
 	MediaStatistics GetStatistics();
 	// add for rtsp watcher by liuhong start
 	int SetParticipant(RTPParticipant *participant);
-	AudioMediaSubsession* GetAudioMediaSubsession() { return audioSubsession;}
-	void SetAudioMediaSubsession(AudioMediaSubsession* audioSubsession) { this->audioSubsession = audioSubsession;}
+	//AudioMediaSubsession* GetAudioMediaSubsession() { return audioSubsession;}
+	//void SetAudioMediaSubsession(AudioMediaSubsession* audioSubsession) { this->audioSubsession = audioSubsession;}
 	RTPSession *InitAudioWatcher(unsigned clientSessionId);
 	RTPSession *AddAudioWatcher(unsigned clientSessionId,char *sendAudioIp,int sendAudioPort,AudioCodec::RTPMap& rtpMap, AudioCodec::Type watcherCodec);
 	int DeleteAudioWatcher(unsigned clientSessionId);
