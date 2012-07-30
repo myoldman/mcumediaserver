@@ -993,6 +993,14 @@ public class RTPParticipant extends Participant {
             SipServletResponse resp = inviteRequest.createResponse(200, "Ok");
             //Attach body
             resp.setContent(createSDP(),"application/sdp");
+            String userName = SipEndPointManager.INSTANCE.getSipEndPointNameByNumber(this.getUsername());
+            String userId = SipEndPointManager.INSTANCE.existNumber(this.getUsername());
+            if(userName != null)
+            {
+                resp.addHeader("username", userName);
+                resp.addHeader("userid", userId);
+            }
+            resp.setHeader("confUid", conf.getUID());
             //Send it
             resp.send();
         } catch (Exception ex) {
@@ -1118,6 +1126,14 @@ public class RTPParticipant extends Participant {
             //Attach body
             inviteRequest.setContent(sdp,"application/sdp");
         }
+        String userName = SipEndPointManager.INSTANCE.getSipEndPointNameByNumber(this.getUsername());
+        String userId = SipEndPointManager.INSTANCE.existNumber(this.getUsername());
+        if(userName != null)
+        {
+            inviteRequest.addHeader("username", userName);
+            inviteRequest.addHeader("userid", userId);
+        }
+        inviteRequest.setHeader("confUid", conf.getUID());
         //Send it
         inviteRequest.send();
         //Log
@@ -1506,8 +1522,16 @@ public class RTPParticipant extends Participant {
         //Send FPU
         String xml ="<?xml version=\"1.0\" encoding=\"utf-8\" ?>\r\n<media_control>\r\n<vc_primitive>\r\n<to_encoder>\r\n<picture_fast_update></picture_fast_update>\r\n</to_encoder>\r\n</vc_primitive>\r\n</media_control>\r\n";
         try {
+            Logger.getLogger(ConferenceMngr.class.getName()).log(Level.INFO, "Send INFO message");
              //Create ack
             SipServletRequest info = session.createRequest("INFO");
+            String doRoute = System.getProperty("DoRoute");
+            if(doRoute != null) {
+                SipURI sipUri = SipEndPointManager.INSTANCE.getSipEndPointUriByNumber(this.getUsername());
+                if(sipUri != null) {                   
+                    info.pushRoute(sipUri);
+                }
+            }
             //Set content
             info.setContent(xml, "application/media_control+xml");
             //Send it
