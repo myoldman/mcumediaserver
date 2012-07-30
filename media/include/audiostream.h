@@ -7,7 +7,7 @@
 #include "rtpsession.h"
 #include "audio.h"
 
-class AudioMediaSubsession;
+//class AudioMediaSubsession;
 class RTPParticipant;
 
 class AudioStream
@@ -36,7 +36,7 @@ public:
 	RTPSession *AddAudioWatcher(unsigned clientSessionId,char *sendAudioIp,int sendAudioPort,AudioCodec::RTPMap& rtpMap, AudioCodec::Type watcherCodec);
 	int DeleteAudioWatcher(unsigned clientSessionId);
 	AudioCodec::Type GetDecodeCodec(){return decodeCodec;};
-	AudioMediaSubsession* CreateAudioSubsession(AudioCodec::Type audioCodec, int payloadType);
+	//AudioMediaSubsession* CreateAudioSubsession(AudioCodec::Type audioCodec, int payloadType);
 	RTPSession* GetRTPSession(){return &rtp;}
 	// add for rtsp watcher by liuhong end
 
@@ -68,7 +68,7 @@ private:
 
 	bool		muted;	
 	// add for rtsp watcher by liuhong begin
-	AudioMediaSubsession* audioSubsession;
+	//AudioMediaSubsession* audioSubsession;
 	typedef std::map<unsigned,RTPSession*> Rtps;
 	Rtps rtps;
 	AudioCodec::Type decodeCodec;

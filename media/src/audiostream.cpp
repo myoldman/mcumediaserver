@@ -8,8 +8,8 @@
 #include <signal.h>
 #include "log.h"
 #include "tools.h"
-#include "AudioMediaSubsession.hh"
-#include "live555MediaServer.h"
+//#include "AudioMediaSubsession.hh"
+//#include "live555MediaServer.h"
 #include "rtpparticipant.h"
 #include "audio.h"
 #include "g711/g711codec.h"
@@ -223,8 +223,8 @@ int AudioStream::End()
 
 	// add for rtsp watcher by liuhong start
 	m_Participant = NULL;
-	if(audioSubsession != NULL)
-		audioSubsession->End();
+	//if(audioSubsession != NULL)
+	//	audioSubsession->End();
 	// add for rtsp watcher by liuhong end
 
 	//Cerramos la session de rtp
@@ -526,13 +526,14 @@ int AudioStream::SetParticipant(RTPParticipant *participant)
 	this->m_Participant = participant;
 	return 1;
 }
-
+/*
 AudioMediaSubsession* AudioStream::CreateAudioSubsession(AudioCodec::Type audioCodec, int payloadType)
 {
 	Live555MediaServer* live555MediaServer = Live555MediaServer::Instance();
 	this->audioSubsession = AudioMediaSubsession::createNew(*live555MediaServer->GetUsageEnvironment(), this, audioCodec, payloadType);
 	return this->audioSubsession;
 }
+*/
 
 RTPSession *AudioStream::InitAudioWatcher(unsigned clientSessionId)
 {
