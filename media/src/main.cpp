@@ -20,7 +20,7 @@ extern "C" {
 #include "libavcodec/avcodec.h"
 }
 // rtsp addon by liuhong
-#include "live555MediaServer.h"
+//#include "live555MediaServer.h"
 
 extern XmlHandlerCmd mcuCmdList[];
 extern XmlHandlerCmd broadcasterCmdList[];
@@ -214,7 +214,7 @@ int main(int argc,char **argv)
 	//Create servers
 	XmlRpcServer	server(port);
 	RTMPServer	rtmpServer;
-	Live555MediaServer* rtspServer = Live555MediaServer::Instance();
+//	Live555MediaServer* rtspServer = Live555MediaServer::Instance();
 
 	//Create services
 	MCU		mcu;
@@ -279,7 +279,7 @@ int main(int argc,char **argv)
 	
 	// rtsp addon by liuhong
 	// Init and start rtsp server
-	rtspServer->Init();
+	//rtspServer->Init();
 
 	//Run it
 	server.Start();
