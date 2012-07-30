@@ -46,7 +46,7 @@ VideoStream::VideoStream(Listener* listener) : rtp(listener)
 	muted = false;
 	// add for rtsp watcher by liuhong start
 	m_Participant = NULL;
-	videoSubsession = NULL;
+	//videoSubsession = NULL;
 	decodeCodec = VideoCodec::H264;
 	m_GroupVideoStream = NULL;
 	videoDecoder = VideoCodecFactory::CreateDecoder(decodeCodec);
