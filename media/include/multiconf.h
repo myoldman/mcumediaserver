@@ -14,7 +14,7 @@
 #include <map>
 #include <string>
 // rtsp addon by liuhong
-#include "RtspWatcher.hh"
+//#include "RtspWatcher.hh"
 #include "groupvideostream.h"
 #include "groupaudiostream.h"
 
@@ -164,7 +164,7 @@ private:
 	int			broadcastId;
 	FLVEncoder		flvEncoder;
 	// rtsp addon by liuhong
-	RtspWatcher		m_RtspWatcher;
+	//RtspWatcher		m_RtspWatcher;
 	AudioEncoder		audioEncoder;
 	TextEncoder		textEncoder;
 	BroadcastSession	broadcast;
