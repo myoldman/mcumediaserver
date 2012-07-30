@@ -5,9 +5,9 @@
 #include "log.h"
 #include "h264decoder.h"
 
-static const char base64Char[] ="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
+static const char base64Char[] ="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
-char* base64Encode(char const* origSigned, unsigned origLength) 
+static char* base64Encode(char const* origSigned, unsigned origLength) 
 {  
 	unsigned char const* orig = (unsigned char const*)origSigned; 
 	// in case any input bytes have the MSB set 
