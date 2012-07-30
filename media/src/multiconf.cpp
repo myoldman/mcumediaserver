@@ -1486,7 +1486,10 @@ int MultiConf::SendFPU(int partId)
 		//Send FPU
 		ret = part->SendVideoFPU();
 	if(m_CurrentBroadCaster != 0)
+	{
+		Log("-RequestFPU [id:%d]\n",m_CurrentBroadCaster);
 		listener->onParticipantRequestFPU(this,m_CurrentBroadCaster,this->param);
+	}
 	//Unlock
 	participantsLock.DecUse();
 
