@@ -70,7 +70,7 @@ public:
 	MP4Recorder	recorder; //FIX this!
 public:
 	// add for rtsp watcher by liuhong start
-	void StartRtspWatcher(char *sps_base64, char *pps_base64);
+	//void StartRtspWatcher(char *sps_base64, char *pps_base64);
 	// add for rtps watcher by liuhong end
 	
 private:

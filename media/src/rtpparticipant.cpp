@@ -7,9 +7,6 @@
 
 #include "rtpparticipant.h"
 #include "log.h"
-#include "VideoMediaSubsession.hh"
-#include "AudioMediaSubsession.hh"
-#include "live555MediaServer.h"
 
 RTPParticipant::RTPParticipant(int partId, int confId) : Participant(Participant::RTP, partId, confId), audio(NULL) , video(this), text(NULL)
 {
@@ -79,6 +76,7 @@ int RTPParticipant::End()
 	text.End();
 	
 	// add for rtsp watcher by liuuhong start
+	/*
 	Log("-----Rtsp watcher stop streaming\n");
 	Live555MediaServer* live555MediaServer = Live555MediaServer::Instance();
 	ServerMediaSession* sms = live555MediaServer->GetRTSPServer()->lookupServerMediaSession(m_StreamName.c_str());
@@ -90,6 +88,7 @@ int RTPParticipant::End()
 	}
 	Log("-----Rtsp watcher stop streaming success\n");
 	// add for rtsp watcher by liuuhong end
+	*/
 }
 
 int RTPParticipant::Init()
@@ -242,6 +241,7 @@ int RTPParticipant::SetMute(MediaFrame::Type media, bool isMuted)
 	}
 	return 0;
 }
+/*
 
 // add for rtsp watcher by liuhong start
 
@@ -276,6 +276,7 @@ void RTPParticipant::StartRtspWatcher(char *sps_base64, char *pps_base64)
 		}
 	}
 
+
 	Log("-----Participant RTSP wathcer start streaming.\n");
 	Live555MediaServer* live555MediaServer = Live555MediaServer::Instance();
 	ServerMediaSession* sms = live555MediaServer->GetRTSPServer()->lookupServerMediaSession(m_StreamName.c_str());
@@ -296,6 +297,9 @@ void RTPParticipant::StartRtspWatcher(char *sps_base64, char *pps_base64)
 	} else {
 		Log("-----Participant RTSP wathcer already exist\n");
 	}
+	
 }
 
 // add for rtsp watcher by liuhong end
+*/
+
