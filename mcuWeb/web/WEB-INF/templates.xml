@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<root>
+    <template audioCodecs="" compType="0" did="400" mixer="local@http://127.0.0.1:8080" name="test" profile="Low Quality@128:10:0" size="0" textCodecs="" videoCodecs=""/>
+    <template audioCodecs="" compType="0" did="500" mixer="local2@http://127.0.0.1:8081" name="test2" profile="Low Quality@128:10:0" size="0" textCodecs="" videoCodecs=""/>
+</root>

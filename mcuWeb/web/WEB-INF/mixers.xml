@@ -1,0 +1,4 @@
+<?xml version="1.0"?>
+<root>
+    <mixer ip="218.85.135.148" name="dcn" publicIp="218.85.135.148" url="http://127.0.0.1:8080" localNet="0.0.0.0/0" />
+</root>
