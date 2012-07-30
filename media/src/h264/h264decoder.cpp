@@ -5,14 +5,16 @@
 #include "log.h"
 #include "h264decoder.h"
 
+static const char base64Char[] ="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
+
 char* base64Encode(char const* origSigned, unsigned origLength) 
 {  
 	unsigned char const* orig = (unsigned char const*)origSigned; 
 	// in case any input bytes have the MSB set 
 	if (orig == NULL) return NULL;  
 	unsigned const numOrig24BitValues = origLength/3;  
-	Boolean havePadding = origLength > numOrig24BitValues*3;  
-	Boolean havePadding2 = origLength == numOrig24BitValues*3 + 2;  
+	bool havePadding = origLength > numOrig24BitValues*3;  
+	bool havePadding2 = origLength == numOrig24BitValues*3 + 2;  
 	unsigned const numResultBytes = 4*(numOrig24BitValues + havePadding); 
 	char* result = new char[numResultBytes+1]; 
 	// allow for trailing '\0'  
