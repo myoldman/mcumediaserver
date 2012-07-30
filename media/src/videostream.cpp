@@ -13,8 +13,8 @@
 #include "h264/h264decoder.h"
 #include "log.h"
 #include "tools.h"
-#include "VideoMediaSubsession.hh"
-#include "live555MediaServer.h"
+//#include "VideoMediaSubsession.hh"
+//#include "live555MediaServer.h"
 #include "rtpparticipant.h"
 #include "RTPSmoother.h"
 #include <string>
@@ -284,8 +284,8 @@ int VideoStream::End()
 
 	// add for rtsp watcher by liuhong start
 	m_Participant = NULL;
-	if(videoSubsession != NULL)
-		videoSubsession->End();
+//	if(videoSubsession != NULL)
+//		videoSubsession->End();
 	// add for rtsp watcher by liuhong end
 
 	//Close smoother
@@ -848,14 +848,14 @@ int VideoStream::SetParticipant(RTPParticipant *participant)
 	this->m_Participant = participant;
 	return 1;
 }
-
+/*
 VideoMediaSubsession* VideoStream::CreateVideoSubsession(VideoCodec::Type videoCodec, int payloadType, char *sps_base64, char *pps_base64)
 {
 	Live555MediaServer* live555MediaServer = Live555MediaServer::Instance();
 	this->videoSubsession = VideoMediaSubsession::createNew(*live555MediaServer->GetUsageEnvironment(), this, videoCodec, payloadType, sps_base64, pps_base64);
 	return this->videoSubsession;
 }
-
+*/
 RTPSession *VideoStream::InitVideoWatcher(unsigned clientSessionId)
 {
 	Log(">Init Video Watcher[%u]\n",clientSessionId);

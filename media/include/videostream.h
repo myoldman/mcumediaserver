@@ -9,7 +9,7 @@
 #include "video.h"
 #include "groupvideostream.h"
 
-class VideoMediaSubsession;
+//class VideoMediaSubsession;
 class RTPParticipant;
 
 class VideoStream 
@@ -40,13 +40,13 @@ public:
 	MediaStatistics GetStatistics();
 	// add for rtsp watcher by liuhong start
 	int SetParticipant(RTPParticipant *participant);
-	VideoMediaSubsession* GetVideoMediaSubsession() { return videoSubsession;}
-	void SetVideoMediaSubsession(VideoMediaSubsession* videoSubsession) { this->videoSubsession = videoSubsession;}
+	//VideoMediaSubsession* GetVideoMediaSubsession() { return videoSubsession;}
+	//void SetVideoMediaSubsession(VideoMediaSubsession* videoSubsession) { this->videoSubsession = videoSubsession;}
 	RTPSession *InitVideoWatcher(unsigned clientSessionId);
 	RTPSession *AddVideoWatcher(unsigned clientSessionId,char *sendVideoIp,int sendVideoPort,VideoCodec::RTPMap& rtpMap, VideoCodec::Type watcherCodec);
 	int DeleteVideoWatcher(unsigned clientSessionId);
 	VideoCodec::Type GetDecodeCodec(){return decodeCodec;};
-	VideoMediaSubsession* CreateVideoSubsession(VideoCodec::Type videoCodec, int payloadType, char *sps_base64, char *pps_base64);
+	//VideoMediaSubsession* CreateVideoSubsession(VideoCodec::Type videoCodec, int payloadType, char *sps_base64, char *pps_base64);
 	RTPSession* GetRTPSession(){return &rtp;}
 	void SetGroupVideoStream(GroupVideoStream* groupVideoStream) { this->m_GroupVideoStream = groupVideoStream;}
 	IDRPacketSize GetIdrPacketSize()
@@ -117,7 +117,7 @@ private:
 	bool	muted;
 	// add for rtsp watcher by liuhong begin
 	//RTP Map types
-	VideoMediaSubsession* videoSubsession;
+	//VideoMediaSubsession* videoSubsession;
 	typedef std::map<unsigned,RTPSession*> Rtps;
 	Rtps rtps;
 	VideoCodec::Type decodeCodec;
