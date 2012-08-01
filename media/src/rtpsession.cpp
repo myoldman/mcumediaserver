@@ -408,8 +408,8 @@ int RTPSession::End()
 int RTPSession::ForwardPacket(BYTE* data, int size, int last, DWORD ts)
 {
 	//Check if we have sendinf ip address
-	if (sendAddr.sin_addr.s_addr == INADDR_ANY)
-	{
+	//if (sendAddr.sin_addr.s_addr == INADDR_ANY)
+	//{
 		//Do we have rec ip?
 		if (recIP!=INADDR_ANY)
 		{
@@ -422,7 +422,7 @@ int RTPSession::ForwardPacket(BYTE* data, int size, int last, DWORD ts)
 		} else
 			//Exit
 			return 0;
-	}
+	//}
 
 	rtp_hdr_t *headers = (rtp_hdr_t *)forwardPacket;
 
@@ -761,8 +761,8 @@ int RTPSession::GetVideoPacket(BYTE *data,DWORD *size,BYTE *last,BYTE *lost,Vide
 int RTPSession::SendAudioPacket(BYTE* data,int size,DWORD frameTime)
 {
 	//Check if we have sendinf ip address
-	if (sendAddr.sin_addr.s_addr == INADDR_ANY)
-	{
+	//if (sendAddr.sin_addr.s_addr == INADDR_ANY)
+	//{
 		//Do we have rec ip?
 		if (recIP!=INADDR_ANY)
 		{
@@ -775,7 +775,7 @@ int RTPSession::SendAudioPacket(BYTE* data,int size,DWORD frameTime)
 		} else
 			//Exit
 			return 0;
-	}
+	//}
 	
 	//Modificamos las cabeceras del packete
 	rtp_hdr_t *headers = (rtp_hdr_t *)sendPacket;
