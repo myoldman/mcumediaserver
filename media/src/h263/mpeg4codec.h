@@ -15,7 +15,7 @@ public:
 	virtual int Decode(BYTE *in,DWORD len);
 	virtual int GetWidth()	{return ctx->width;};
 	virtual int GetHeight()	{return ctx->height;};
-	virtual int GetFPS() {return round(1 / av_q2d(ctx->time_base));};
+	virtual int GetFPS() {return (int)round(1 / av_q2d(ctx->time_base));};
 	virtual BYTE* GetFrame(){return (BYTE *)bufDecode;};
 	virtual DWORD GetFrameSize(){return 0;};
 	virtual int GetBitRate(){return ctx->bit_rate;};
