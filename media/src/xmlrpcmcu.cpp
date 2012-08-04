@@ -232,6 +232,41 @@ xmlrpc_value* DeleteMosaic(xmlrpc_env *env, xmlrpc_value *param_array, void *use
 	return xmlok(env,xmlrpc_build_value(env,"(i)",mosaicId));
 }
 
+xmlrpc_value* CreateSpy(xmlrpc_env *env, xmlrpc_value *param_array, void *user_data)
+{
+	MCU *mcu = (MCU *)user_data;
+	MultiConf *conf = NULL;
+	UTF8Parser parser;
+	
+	 //Parseamos
+	int confId;
+	int spyeeId;
+
+	xmlrpc_parse_value(env, param_array, "(ii)", &confId,&spyeeId);
+	
+	//Comprobamos si ha habido error
+	if(env->fault_occurred)
+		xmlerror(env,"Fault occurred\n");
+		 
+	//Obtenemos la referencia
+	if(!mcu->GetConferenceRef(confId,&conf))
+		return xmlerror(env,"Conference does not exist");
+	
+	//La borramos
+	int spyId = conf->CreateSpy(spyeeId);
+	
+	//Liberamos la referencia
+	mcu->ReleaseConferenceRef(confId);
+	
+	//Salimos
+	if(!spyId)
+		return xmlerror(env,"Create spy failed \n");
+	
+	//Devolvemos el resultado
+	return xmlok(env,xmlrpc_build_value(env,"(i)",spyId));
+
+}
+
 xmlrpc_value* CreateParticipant(xmlrpc_env *env, xmlrpc_value *param_array, void *user_data)
 {
 	MCU *mcu = (MCU *)user_data;
@@ -268,6 +303,38 @@ xmlrpc_value* CreateParticipant(xmlrpc_env *env, xmlrpc_value *param_array, void
 
 	//Devolvemos el resultado
 	return xmlok(env,xmlrpc_build_value(env,"(i)",partId));
+}
+
+xmlrpc_value* DeleteSpy(xmlrpc_env *env, xmlrpc_value *param_array, void *user_data)
+{
+	MCU *mcu = (MCU *)user_data;
+	MultiConf *conf = NULL;
+
+	 //Parseamos
+	int confId;
+	int spyId;
+	xmlrpc_parse_value(env, param_array, "(ii)", &confId,&spyId);
+
+	//Comprobamos si ha habido error
+	if(env->fault_occurred)
+		xmlerror(env,"Fault occurred\n");
+	 
+	//Obtenemos la referencia
+	if(!mcu->GetConferenceRef(confId,&conf))
+		return xmlerror(env,"Conference does not exist");
+
+	//La borramos
+	int res = conf->DeleteSpy(spyId);
+
+	//Liberamos la referencia
+	mcu->ReleaseConferenceRef(confId);
+
+	//Salimos
+	if(!res)
+		return xmlerror(env,"Delete spy error\n");
+
+	//Devolvemos el resultado
+	return xmlok(env);
 }
 
 xmlrpc_value* DeleteParticipant(xmlrpc_env *env, xmlrpc_value *param_array, void *user_data)
@@ -511,6 +578,66 @@ xmlrpc_value* SetVideoCodec(xmlrpc_env *env, xmlrpc_value *param_array, void *us
 	return xmlok(env);
 }
 
+xmlrpc_value* StartSendingVideoSpy(xmlrpc_env *env, xmlrpc_value *param_array, void *user_data)
+{
+	MCU *mcu = (MCU *)user_data;
+	MultiConf *conf = NULL;
+
+	 //Parseamos
+	int confId;
+	int spyId;
+	char *sendVideoIp;
+	int sendVideoPort;
+	xmlrpc_value *rtpMap;
+	xmlrpc_parse_value(env, param_array, "(iisiS)", &confId,&spyId,&sendVideoIp,&sendVideoPort,&rtpMap);
+
+	//Get the rtp map
+	VideoCodec::RTPMap map;
+
+	//Get map size
+	int j = xmlrpc_struct_size(env,rtpMap);
+
+	//Parse rtp map
+	for (int i=0;i<j;i++)
+	{
+		xmlrpc_value *key, *val;
+		const char *type;
+		int codec;
+		//Read member
+		xmlrpc_struct_read_member(env,rtpMap,i,&key,&val);
+		//Read name
+		xmlrpc_parse_value(env,key,"s",&type);
+		//Read value
+		xmlrpc_parse_value(env,val,"i",&codec);
+		//Add to map
+		map[atoi(type)] = (VideoCodec::Type) codec;
+		//Decrement ref counter
+		xmlrpc_DECREF(key);
+		xmlrpc_DECREF(val);
+	}
+
+	//Comprobamos si ha habido error
+	if(env->fault_occurred)
+		xmlerror(env,"Fault occurred\n");
+
+	//Obtenemos la referencia
+	if(!mcu->GetConferenceRef(confId,&conf))
+		return xmlerror(env,"Conference does not exist");
+
+	//La borramos
+	int res = conf->StartSendingVideoSpy(spyId,sendVideoIp,sendVideoPort,map) != NULL;
+
+	//Liberamos la referencia
+	mcu->ReleaseConferenceRef(confId);
+
+	//Salimos
+	if(!res)
+		return xmlerror(env,"Error\n");
+
+	//Devolvemos el resultado
+	return xmlok(env);
+}
+
 xmlrpc_value* StartSendingVideo(xmlrpc_env *env, xmlrpc_value *param_array, void *user_data)
 {
 	MCU *mcu = (MCU *)user_data;
@@ -602,6 +729,65 @@ xmlrpc_value* StopSendingVideo(xmlrpc_env *env, xmlrpc_value *param_array, void 
 	//Devolvemos el resultado
 	return xmlok(env);
 }
+
+xmlrpc_value* StartReceivingVideoSpy(xmlrpc_env *env, xmlrpc_value *param_array, void *user_data)
+{
+	MCU *mcu = (MCU *)user_data;
+	MultiConf *conf = NULL;
+	
+	 //Parseamos
+	int confId;
+	int spyId;
+	xmlrpc_value *rtpMap;
+	xmlrpc_parse_value(env, param_array, "(iiS)", &confId,&spyId,&rtpMap);
+	
+	//Get the rtp map
+	VideoCodec::RTPMap map;
+	
+	//Get map size
+	int j = xmlrpc_struct_size(env,rtpMap);
+	
+	//Parse rtp map
+	for (int i=0;i<j;i++)
+	{
+		xmlrpc_value *key, *val;
+		const char *type;
+		int codec;
+		//Read member
+		xmlrpc_struct_read_member(env,rtpMap,i,&key,&val);
+		//Read name
+		xmlrpc_parse_value(env,key,"s",&type);
+		//Read value
+		xmlrpc_parse_value(env,val,"i",&codec);
+		//Add to map
+		map[atoi(type)] = (VideoCodec::Type) codec;
+		//Decrement ref counter
+		xmlrpc_DECREF(key);
+		xmlrpc_DECREF(val);
+	}
+	
+	//Comprobamos si ha habido error
+	if(env->fault_occurred)
+		xmlerror(env,"Fault occurred\n");
+		 
+	//Obtenemos la referencia
+	if(!mcu->GetConferenceRef(confId,&conf))
+		return xmlerror(env,"Conference does not exist");
+	
+	//La borramos
+	int recVideoPort = conf->StartReceivingVideoSpy(spyId,map);
+	
+	//Liberamos la referencia
+	mcu->ReleaseConferenceRef(confId);
+	
+	//Salimos
+	if(!recVideoPort)
+		return xmlerror(env,"No se ha podido terminar la conferencia\n");
+	
+	//Devolvemos el resultado
+	return xmlok(env,xmlrpc_build_value(env,"(i)",recVideoPort));
+}
+
 
 xmlrpc_value* StartReceivingVideo(xmlrpc_env *env, xmlrpc_value *param_array, void *user_data)
 {

@@ -141,6 +141,13 @@ private:
 	volatile int	recvingRtcp;
 	TaskFunc* rtcpRRHandler;
 	void* rtcpRRHandlerClientData;
+public:
+	pthread_t recvRtpThread;
+	void startRecvSpyRtp();
+protected:
+	static void *startRecvingRtp(void *par);
+	int RecvRtp();
+	volatile int	recvingRtp;
 };
 
 #endif

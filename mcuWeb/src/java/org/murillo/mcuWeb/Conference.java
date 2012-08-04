@@ -19,6 +19,7 @@
 package org.murillo.mcuWeb;
 
 import com.ffcs.mcu.SipEndPointManager;
+import com.ffcs.mcu.Spyer;
 import com.ffcs.mcu.pojo.SipEndPoint;
 import java.text.SimpleDateFormat;
 import java.util.Map.Entry;
@@ -145,7 +146,7 @@ public class Conference implements Participant.Listener {
     public void destroy() {
         //Check if already was destroying
         //Logger.getLogger("global").log(Level.SEVERE, "destroy conf");
-         synchronized( this) {
+        synchronized (this) {
             if (isDestroying) //Do nothing
             {
                 return;
@@ -334,6 +335,33 @@ public class Conference implements Participant.Listener {
 
     public Boolean isAdHoc() {
         return isAdHoc;
+    }
+
+    public Spyer createSpyer(String spyee, String spyer) {
+        Integer partId = Integer.parseInt(spyee);
+        Integer spyer_number = Integer.parseInt(spyer);
+        try {
+            RTPParticipant part = (RTPParticipant) getParticipant(partId);
+            Spyer spy = part.GetSpyer(spyer_number);
+            if(spy != null)
+                return spy;
+            Integer spyId = client.CreateSpy(id, partId);
+            spy  = new Spyer(spyId, spyer_number, this, part); 
+            for (Entry<String, List<Integer>> media : supportedCodecs.entrySet()) //for each codec
+            {
+                for (Integer codec : media.getValue()) //Add media codec
+                {
+                    ((RTPParticipant) part).addSupportedCodec(media.getKey(), codec);
+                }
+            }
+            spy.setListener(part);
+            return spy;
+        } catch (XmlRpcException ex) {
+            Logger.getLogger(Conference.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ParticipantNotFoundException ex) {
+            Logger.getLogger(ConferenceMngr.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
     }
 
     public Participant createParticipant(Participant.Type type, int mosaicId, String name) {
@@ -525,7 +553,7 @@ public class Conference implements Participant.Listener {
         return new RTMPUrl("rtmp://" + mixer.getPublicIp() + "/mcu/" + id + "/watcher", token);
     }
 
-    synchronized Participant  callParticipant(String dest) {
+    synchronized Participant callParticipant(String dest) {
         //Get ip address
         String domain = System.getProperty("SipBindAddress");
         //If it is not set
@@ -619,10 +647,10 @@ public class Conference implements Participant.Listener {
         if (state == State.CONNECTED) {
             for (Participant partIter : participants.values()) {
                 if (partIter.getType() == Participant.Type.SIP && partIter.getState() == State.CONNECTED) {
-                    ((RTPParticipant)partIter).sendMemberNofity(state, part.getId());
+                    ((RTPParticipant) partIter).sendMemberNofity(state, part.getId());
                 }
             }
-            if(part.is_desktop_share) {
+            if (part.is_desktop_share) {
                 setMosaicSlot(0, part.getId());
             }
         }
@@ -630,7 +658,7 @@ public class Conference implements Participant.Listener {
         if (state == State.DISCONNECTED) {
             for (Participant partIter : participants.values()) {
                 if (partIter.getType() == Participant.Type.SIP && partIter.getState() == State.CONNECTED) {
-                    ((RTPParticipant)partIter).sendMemberNofity(state, part.getId());
+                    ((RTPParticipant) partIter).sendMemberNofity(state, part.getId());
                 }
             }
         }
@@ -668,13 +696,11 @@ public class Conference implements Participant.Listener {
         supportedCodecs.get(media).add(codec);
     }
     /*
-    protected final XmlRpcMcuClient getMCUClient() {
-        return client;
-    }
-    * 
-    */
+     * protected final XmlRpcMcuClient getMCUClient() { return client; }
+     *
+     */
 
-    protected final String getRTPIp() {
+    public final String getRTPIp() {
         return mixer.getIp();
     }
 

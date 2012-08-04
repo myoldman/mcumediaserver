@@ -18,6 +18,7 @@ MultiConf::MultiConf(const std::wstring &tag, int confId) : broadcast(tag)
 
 	//Inicializamos el contador
 	maxId = 500;
+	spyId = 1000;
 
 	//Y no tamos iniciados
 	inited = 0;
@@ -416,6 +417,27 @@ int MultiConf::DeleteMosaic(int mosaicId)
 	return videoMixer.DeleteMosaic(mosaicId);
 }
 
+
+int MultiConf::CreateSpy(int spyeeId)
+{
+	Participant *part = NULL;
+	Log(">CreateSpy [spyee:%d]\n",spyeeId);	
+	if (!inited)
+		return Error("Not inited\n");
+	
+	//Get lock
+	spysLock.WaitUnusedAndLock();
+
+	//Obtenemos el id
+	int spyId = this->spyId++;
+	spys[spyId] = spyeeId;
+
+	//Unlock
+	spysLock.Unlock();
+
+	Log("<CreateSpy [%d]\n",spyeeId);	
+}
+
 /************************
 * CreateParticipant
 * 	A�ade un participante
@@ -525,6 +547,35 @@ int MultiConf::CreateParticipant(int mosaicId,std::wstring name,Participant::Typ
 	Log("<CreateParticipant [%d]\n",partId);
 
 	return partId;
+}
+
+int MultiConf::DeleteSpy(int spyId)
+{
+	int ret = 0;
+	if(spys.find(spyId) == spys.end())
+		return 0;
+	
+	int spyeeId = spys[spyId];	
+
+	Log(">DeleteSpy [%d]\n",spyId);
+
+	//Use list
+	participantsLock.IncUse();
+	RTPParticipant *part = (RTPParticipant*)GetParticipant(spyeeId,Participant::RTP);
+	
+	//Check particpant
+	if (part)
+		//Set video codec
+		ret = part->DeleteVideoSpy(spyId);
+
+
+	//Unlock
+	participantsLock.DecUse();
+	
+
+	Log("<DeleteSpy [%d]\n",id);
+
+	return 1;
 }
 
 /************************
@@ -740,6 +791,34 @@ int MultiConf::SetVideoCodec(int id,int codec,int mode,int fps,int bitrate,int q
 	return ret;
 }
 
+
+int MultiConf::StartSendingVideoSpy(int spyId,char *sendVideoIp,int sendVideoPort,VideoCodec::RTPMap& rtpMap)
+{
+	int ret = 0;
+	if(spys.find(spyId) == spys.end())
+		return 0;
+	
+	int spyeeId = spys[spyId];	
+
+	Log("-StartSendingVideoSpy [%d]\n",spyeeId);
+	//Use list
+	participantsLock.IncUse();
+	RTPParticipant *part = (RTPParticipant*)GetParticipant(spyeeId,Participant::RTP);
+	
+	//Check particpant
+	if (part)
+		//Set video codec
+		ret = part->StartSendingVideoSpy(spyId, rtpMap);
+
+
+	//Unlock
+	participantsLock.DecUse();
+	//Start sending the video
+	//return ((RTPParticipant*)part)->StartSendingVideo(sendVideoIp,sendVideoPort,rtpMap);
+	return rtp;
+
+}
+
 /************************
 * StartSendingVideo
 * 	StartSendingVideo
@@ -849,6 +928,36 @@ int MultiConf::StopSendingVideo(int id)
 	return 1;
 	//Stop sending the video
 	//return ((RTPParticipant*)part)->StopSendingVideo();
+}
+
+
+int MultiConf::StartReceivingVideoSpy(int spyId, VideoCodec::RTPMap& rtpMap)
+{
+	int ret = 0;
+	
+	Log("-StartReceivingVideoSpy [%d]\n",spyId);
+
+	if(spys.find(spyId) == spys.end())
+		return 0;
+	
+	int spyeeId = spys[spyId];
+	//Use list
+	participantsLock.IncUse();
+
+	//Get the participant
+	RTPParticipant *part = (RTPParticipant*)GetParticipant(spyeeId,Participant::RTP);
+
+	//Check particpant
+	if (part)
+		//Set video codec
+		ret = part->StartReceivingVideoSpy(spyId, rtpMap);
+
+	//Unlock
+	participantsLock.DecUse();
+
+	//Exit
+	return ret;
+
 }
 
 /************************

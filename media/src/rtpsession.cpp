@@ -56,7 +56,9 @@ RTPSession::RTPSession(Listener *listener)
 	recRTCPIP = INADDR_ANY;
 	recRTCPPort = 0;
 	recvingRtcp = 0;
+	recvingRtp = 0;
 	recvRtcpThread = 0;
+	recvRtpThread = 0;
 	rtcpRRHandler = NULL;
 	memset(rtcpPacket, 0, MTU);
 }
@@ -393,6 +395,11 @@ int RTPSession::End()
 		pthread_join(recvRtcpThread,NULL);
 		recvRtcpThread = 0;
 	}
+	recvingRtp=0;
+	if(recvRtpThread!=0) {
+		pthread_join(recvRtpThread,NULL);
+		recvRtpThread = 0;
+	}
 	Log("<RTPSession End %p %d begin\n", this, simSocket);
 	//Cerramos los sockets
 	if(simSocket > 0) {
@@ -418,7 +425,7 @@ int RTPSession::ForwardPacket(BYTE* data, int size, int last, DWORD ts)
 			//Get port
 			sendAddr.sin_port = htons(recPort);
 			//Log
-			Log("-RTPSession NAT: Now sending to [%s:%d].\n", inet_ntoa(sendAddr.sin_addr), recPort);
+			//Log("-RTPSession NAT: Now sending to [%s:%d].\n", inet_ntoa(sendAddr.sin_addr), recPort);
 		} else
 			//Exit
 			return 0;
@@ -771,7 +778,7 @@ int RTPSession::SendAudioPacket(BYTE* data,int size,DWORD frameTime)
 			//Get port
 			sendAddr.sin_port = htons(recPort);
 			//Log
-			Log("-RTPSession NAT: Now sending to [%s:%d].\n", inet_ntoa(sendAddr.sin_addr), recPort);
+			//Log("-RTPSession NAT: Now sending to [%s:%d].\n", inet_ntoa(sendAddr.sin_addr), recPort);
 		} else
 			//Exit
 			return 0;
@@ -1294,5 +1301,69 @@ void RTPSession::CreateRtcpPacket(BYTE* buffer,int type)
 	int sr_size=sizeof(rtcp_common_t) + sizeof(rtcp_sr_info_t);
 	headers->length = (sr_size/4)-1;
 }
+
+void RTPSession::startRecvSpyRtp()
+{
+	recvingRtp=1;
+	createPriorityThread(&recvRtpThread,startRecvingRtp,this,1);
+}
+
+void* RTPSession::startRecvingRtp(void *par)
+{
+	Log("startRecvingVideoSpyRtp [%d]\n",getpid());
+
+	//OBtenemos el objeto
+	RTPSession *rtp = (RTPSession *)par;
+
+	//Bloqueamos las se�ales
+	blocksignals();
+
+	//Y ejecutamos la funcion
+	pthread_exit((void *)rtp->RecvRtp());
+}
+
+int RTPSession::RecvRtp()
+{
+	BYTE	data[MTU];
+	DWORD	size = MTU;
+	Log(">RecvRtp\n");
+	while(recvingRtp)
+	{
+		size = MTU;
+		sockaddr_in from_addr;
+		DWORD from_len = sizeof(from_addr);
+		
+		//Esperamos
+		if(!WaitForSocket(simSocket,1))
+			continue;
+		
+		//Receive from everywhere
+		memset(&from_addr, 0, from_len);
+		//Set receiver IP address
+		from_addr.sin_addr.s_addr = recIP;
+		from_addr.sin_port = htons(recPort);
+		
+		//Leemos del socket
+		int num = recvfrom(simSocket,recBuffer,MTU,0,(sockaddr*)&from_addr, &from_len);
+		
+		//If we don't have originating IP
+		if (recIP==INADDR_ANY)
+		{
+			//Check if already NATED and got listener
+			if (sendAddr.sin_addr.s_addr == INADDR_ANY && listener)
+				//Request FIR
+			listener->onFPURequested(this);
+			//Bind it to first received packet ip
+			recIP = from_addr.sin_addr.s_addr;
+			//Get also port
+			recPort = ntohs(from_addr.sin_port);
+				//Log
+			Log("-RTPSession NAT: received packet from [%s:%d]\n", inet_ntoa(from_addr.sin_addr), recPort);
+		}
+		recvingRtp = 0;
+	}
+	Log("<RecvRtp end\n");
+}
+
 
 

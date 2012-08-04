@@ -99,6 +99,11 @@ int RTPParticipant::Init()
 	text.Init(textInput,textOutput);
 }
 
+int RTPParticipant::StartSendingVideoSpy(int spyId, char *sendVideoIp,int sendVideoPort,VideoCodec::RTPMap& rtpMap)
+{
+	return video.AddVideoWatcher(spyId,sendVideoIp,sendVideoPort, rtpMap, VideoCodec::H264);
+}
+
 int RTPParticipant::StartSendingVideo(char *ip,int port,VideoCodec::RTPMap& rtpMap)
 {
 	//Start sending
@@ -109,6 +114,12 @@ int RTPParticipant::StopSendingVideo()
 {
 	//Stop sending
 	return video.StopSending();
+}
+
+int RTPParticipant::StartReceivingVideoSpy(int spyId, VideoCodec::RTPMap& rtpMap)
+{
+	RTPSession *rtp = video.InitVideoWatcher(spyId, rtpMap);
+	return rtp!=NULL?rtp->GetLocalPort():0;
 }
 
 int RTPParticipant::StartReceivingVideo(VideoCodec::RTPMap& rtpMap)
@@ -241,6 +252,12 @@ int RTPParticipant::SetMute(MediaFrame::Type media, bool isMuted)
 	}
 	return 0;
 }
+
+int RTPParticipant::DeleteVideoSpy(int spyId)
+{
+	return video.DeleteVideoWatcher(spyId);
+}
+
 /*
 
 // add for rtsp watcher by liuhong start

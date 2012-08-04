@@ -209,6 +209,18 @@ public class XmlRpcMcuClient {
         return ((Integer)returnVal[0])==1;
     }
     
+    public Integer CreateSpy(Integer confId, Integer spyeeId) throws XmlRpcException
+    {
+       //Create request
+        Object[] request = new Object[]{confId,spyeeId};
+        //Execute 
+        HashMap response = (HashMap) client.execute("CreateSpy", request);
+        //Get result
+        Object[] returnVal = (Object[]) response.get("returnVal");
+        //Return part id
+        return (Integer)returnVal[0];  
+    }
+    
     public Integer CreateParticipant(Integer confId,Integer mosaicId,String name,Integer type) throws XmlRpcException
     {
          //Create request
@@ -271,7 +283,17 @@ public class XmlRpcMcuClient {
         //Return 
         return true;
     }
-    
+        
+    public boolean StartSendingVideoSpy(Integer confId,Integer spyId,String sendVideoIp,Integer sendVideoPort,HashMap<Integer,Integer> rtpMap) throws XmlRpcException
+    {
+        //Create request
+        Object[] request = new Object[]{confId,spyId,sendVideoIp,sendVideoPort,rtpMap};
+        //Execute 
+        HashMap response = (HashMap) client.execute("StartSendingVideoSpy", request);
+        //Return 
+        return true;
+    }
+             
     public boolean StartSendingVideo(Integer confId,Integer partId,String sendVideoIp,Integer sendVideoPort,HashMap<Integer,Integer> rtpMap) throws XmlRpcException
     {
         //Create request
@@ -290,6 +312,17 @@ public class XmlRpcMcuClient {
         HashMap response = (HashMap) client.execute("StopSendingVideo", request);
         //Return 
         return true;
+    }
+    
+    public Integer StartReceivingVideoSpy(Integer confId, Integer spyId, HashMap<Integer,Integer> rtpMap) throws XmlRpcException{
+         //Create request
+        Object[] request = new Object[]{confId,spyId,rtpMap};
+        //Execute 
+        HashMap response = (HashMap) client.execute("StartReceivingVideoSpy", request);
+        //Get result
+        Object[] returnVal = (Object[]) response.get("returnVal");
+        //Return port
+        return (Integer)returnVal[0];
     }
     
     public Integer StartReceivingVideo(Integer confId,Integer partId,HashMap<Integer,Integer> rtpMap) throws XmlRpcException
@@ -430,6 +463,16 @@ public class XmlRpcMcuClient {
         return true;
     }
 
+    public boolean DeleteSpy(Integer confId,Integer spyId) throws XmlRpcException
+    {
+        //Create request
+        Object[] request = new Object[]{confId,spyId};
+        //Execute 
+        HashMap response = (HashMap) client.execute("DeleteSpy", request);
+        //Return 
+        return true;
+    }
+        
     public boolean StartBroadcaster(Integer confId) throws XmlRpcException
     {
         //Create request

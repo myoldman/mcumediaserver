@@ -19,6 +19,7 @@
 package org.murillo.mcuWeb;
 
 import com.ffcs.mcu.SipEndPointManager;
+import com.ffcs.mcu.Spyer;
 import com.ffcs.mcu.pojo.SipEndPoint;
 import java.io.IOException;
 import java.io.InputStream;
@@ -102,6 +103,7 @@ public abstract class Participant implements Serializable {
     protected boolean is_desktop_share;
     protected boolean isDestroying;
     protected XmlRpcMcuClient client;
+    protected Map<Integer, Spyer> spyers;
 
     /**
      * @return the sendIp
@@ -131,7 +133,8 @@ public abstract class Participant implements Serializable {
 
         SIP("SIP", XmlRpcMcuClient.RTP),
         RTSP("RTSP", XmlRpcMcuClient.RTP),
-        WEB("WEB", XmlRpcMcuClient.RTMP);
+        WEB("WEB", XmlRpcMcuClient.RTMP),
+        SPY("SPY", XmlRpcMcuClient.RTP);
         public final String name;
         public final Integer value;
 
@@ -174,6 +177,7 @@ public abstract class Participant implements Serializable {
         autoAccept = false;
         //Create listeners
         listeners = new HashSet<Listener>();
+        spyers = new HashMap<Integer, Spyer>();
         //Initial state
         state = State.CREATED;
         admin = false;
@@ -374,5 +378,9 @@ public abstract class Participant implements Serializable {
         json.put("ismute", getAudioMuted());
         json.put("rtsp_url", "rtsp://" + conf.getMixer().getPublicIp() + "/" + conf.getId() + getId());
         return json;
+    }
+
+    public Spyer GetSpyer(Integer spyer){
+        return spyers.get(spyer);
     }
 }

@@ -59,6 +59,7 @@ public:
 	int ResetMosaicOverlay(int mosaicId);
 	int DeleteMosaic(int mosaicId);
 	int CreateParticipant(int mosaicId,std::wstring name,Participant::Type type);
+	int CreateSpy(int spyeeId);
 	int StartRecordingParticipant(int partId,const char* filename);
 	int StopRecordingParticipant(int partId);
 	int SendFPU(int partId);
@@ -66,7 +67,7 @@ public:
 	ParticipantStatistics* GetParticipantStatistic(int partId);
 	int SetParticipantMosaic(int partId,int mosaicId);
 	int DeleteParticipant(int partId);
-
+	int DeleteSpy(int spyId);
 	int CreatePlayer(int privateId,std::wstring name);
 	int StartPlaying(int playerId,const char* filename,bool loop);
 	int StopPlaying(int playerId);
@@ -80,8 +81,11 @@ public:
 	//Video
 	int SetVideoCodec(int partId,int codec,int mode,int fps,int bitrate,int quality=0, int fillLevel=0,int intraPeriod = 0);
 	RTPSession *StartSendingVideo(int partId,char *sendVideoIp,int sendVideoPort,VideoCodec::RTPMap& rtpMap);
+	int StartSendingVideoSpy(int spyId,char *sendVideoIp,int sendVideoPort,VideoCodec::RTPMap& rtpMap);
+	
 	int StopSendingVideo(int partId);
 	int StartReceivingVideo(int partId,VideoCodec::RTPMap& rtpMap);
+	int StartReceivingVideoSpy(int spyId, VideoCodec::RTPMap& map);
 	int StopReceivingVideo(int partId);
 	int IsSendingVideo(int partId);
 	int IsReceivingVideo(int partId);
@@ -138,6 +142,7 @@ private:
 	typedef std::set<std::wstring> BroadcastTokens;
 	typedef std::map<std::wstring,DWORD> ParticipantTokens;
 	typedef std::map<int, MP4Player*> Players;
+	typedef std::map<int, int> Spys;
 	
 private:
 	ParticipantTokens	inputTokens;
@@ -146,6 +151,7 @@ private:
 	//Atributos
 	int		inited;
 	int		maxId;
+	int 	spyId;
 	std::wstring	tag;
 
 	Listener *listener;
@@ -159,6 +165,7 @@ private:
 	//Lists
 	Participants		participants;
 	Players			players;
+	Spys 			spys;
 
 	int			watcherId;
 	int			broadcastId;
@@ -177,6 +184,7 @@ private:
 private:
 	void SendIdrPacket(RTPSession *rtp);
 	Use			participantsLock;
+	Use			spysLock;
 };
 
 #endif

@@ -245,7 +245,7 @@ public class MediaMixer implements Serializable {
         return state;
     }
 
-    void releaseMcuClient(XmlRpcMcuClient client) {
+    public void releaseMcuClient(XmlRpcMcuClient client) {
         //Release client
         mcuClients.remove(client);
     }

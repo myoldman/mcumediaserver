@@ -856,11 +856,21 @@ VideoMediaSubsession* VideoStream::CreateVideoSubsession(VideoCodec::Type videoC
 	return this->videoSubsession;
 }
 */
-RTPSession *VideoStream::InitVideoWatcher(unsigned clientSessionId)
+RTPSession *VideoStream::InitVideoWatcher(unsigned clientSessionId, VideoCodec::RTPMap& rtpMap)
 {
 	Log(">Init Video Watcher[%u]\n",clientSessionId);
 	RTPSession* rtp = new RTPSession(NULL);
 	rtps[clientSessionId] = rtp;
+	if(!rtp->Init())
+	{
+		delete rtp;
+		Error("Rtp init error\n");
+		return NULL;
+	}
+	
+	//Set receving map
+	rtp->SetReceivingVideoRTPMap(rtpMap);
+	rtp->startRecvSpyRtp();
 	Log("<Init Video Watcher success [%u]\n",clientSessionId);
 	return rtp;
 }
@@ -884,14 +894,6 @@ RTPSession *VideoStream::AddVideoWatcher(unsigned clientSessionId,char *sendVide
 		return NULL;
 	}
 	rtp = (*it).second;
-
-	if(!rtp->Init())
-	{
-		delete rtp;
-		Error("Rtp init error\n");
-		return NULL;
-	}
-	
 	
 	//Iniciamos las sesiones rtp de envio
 	if(!rtp->SetRemotePort(sendVideoIp,sendVideoPort))

@@ -19,6 +19,7 @@
 package org.murillo.mcuWeb;
 
 import com.ffcs.mcu.SipEndPointManager;
+import com.ffcs.mcu.Spyer;
 import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
 import java.beans.XMLDecoder;
 import java.io.FileNotFoundException;
@@ -994,23 +995,32 @@ public class ConferenceMngr implements Conference.Listener, XmlRpcEventManager.L
         {
             name = from.getUser();
         }
+        
+        String spy_number = request.getHeader("spy_number");
+  
+        if(spy_number != null) {
+            //Log
+            Logger.getLogger(ConferenceMngr.class.getName()).log(Level.FINEST, "creating spy for confId={0} partId = {1}", new Object[]{ conf.getId(), spy_number});
+            Spyer spyer = conf.createSpyer(spy_number, from.getUser());
+            spyer.onInviteRequest(request);
+        } else {
+            //Log
+            Logger.getLogger(ConferenceMngr.class.getName()).log(Level.FINEST, "creating participant for confId={0}", conf.getId());
 
-        //Log
-        Logger.getLogger(ConferenceMngr.class.getName()).log(Level.FINEST, "creating participant for confId={0}", conf.getId());
-
-        //Create participant
-        RTPParticipant part = (RTPParticipant) conf.createParticipant(Participant.Type.SIP, XmlRpcMcuClient.DefaultMosaic, name);
-        String displayName = SipEndPointManager.INSTANCE.getSipEndPointNameByNumber(name);
-        if (request.getHeader("desktop_share") != null) {
-            displayName = displayName + "-桌面共享";
+            //Create participant
+            RTPParticipant part = (RTPParticipant) conf.createParticipant(Participant.Type.SIP, XmlRpcMcuClient.DefaultMosaic, name);
+            String displayName = SipEndPointManager.INSTANCE.getSipEndPointNameByNumber(name);
+            if (request.getHeader("desktop_share") != null) {
+                displayName = displayName + "-桌面共享";
+            }
+            if (displayName != null) {
+                part.setDisplayName(displayName);
+            }
+            //Log
+            Logger.getLogger(ConferenceMngr.class.getName()).log(Level.FINEST, "calling part.onInvite for confId={0}", conf.getId());
+            //Let it handle the request
+            part.onInviteRequest(request);
         }
-        if (displayName != null) {
-            part.setDisplayName(displayName);
-        }
-        //Log
-        Logger.getLogger(ConferenceMngr.class.getName()).log(Level.FINEST, "calling part.onInvite for confId={0}", conf.getId());
-        //Let it handle the request
-        part.onInviteRequest(request);
     }
 
     public void onConferenceEnded(Conference conf) {

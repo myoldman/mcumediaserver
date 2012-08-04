@@ -20,6 +20,7 @@
 package org.murillo.mcuWeb;
 
 import com.ffcs.mcu.SipEndPointManager;
+import com.ffcs.mcu.Spyer;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -52,7 +53,7 @@ import org.murillo.mcuWeb.Participant.State;
  *
  * @author Sergio
  */
-public class RTPParticipant extends Participant {
+public class RTPParticipant extends Participant  implements Spyer.Listener {
 
     private Address address;
     private SipSession session = null;
@@ -89,7 +90,7 @@ public class RTPParticipant extends Participant {
     private final String h264profileLevelIdDefault = "428014";
     private int videoBitrate;
 
-    RTPParticipant(Integer id,String name,Integer mosaicId,Conference conf) throws XmlRpcException {
+    public RTPParticipant(Integer id,String name,Integer mosaicId,Conference conf) throws XmlRpcException {
         //Call parent
         super(id,name,mosaicId,conf,Type.SIP);
         //Not sending
@@ -1419,6 +1420,10 @@ public class RTPParticipant extends Participant {
         //Set state
         setState(State.DESTROYED);
         conf.getMixer().releaseMcuClient(client);
+        for(Spyer spyer : spyers.values()){
+            spyer.end();
+        }
+        spyers.clear();
     }
 
     public void startSending() throws XmlRpcException {
@@ -1568,5 +1573,11 @@ public class RTPParticipant extends Participant {
             Logger.getLogger(RTPParticipant.class.getName()).log(Level.SEVERE, "Error while requesting Nofity for participant", ex);
         }
         
+    }
+
+    public void onStateChanged(Spyer part, Spyer.State state) {
+        if (state.equals(Spyer.State.DESTROYED)) {
+            spyers.remove(part.getSpyer_number());
+        }
     }
 }
