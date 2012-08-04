@@ -101,7 +101,8 @@ int RTPParticipant::Init()
 
 int RTPParticipant::StartSendingVideoSpy(int spyId, char *sendVideoIp,int sendVideoPort,VideoCodec::RTPMap& rtpMap)
 {
-	return video.AddVideoWatcher(spyId,sendVideoIp,sendVideoPort, rtpMap, VideoCodec::H264);
+	RTPSession *rtp = video.AddVideoWatcher(spyId,sendVideoIp,sendVideoPort, rtpMap, VideoCodec::H264);
+	return rtp != NULL ? 1:0;
 }
 
 int RTPParticipant::StartSendingVideo(char *ip,int port,VideoCodec::RTPMap& rtpMap)

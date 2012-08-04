@@ -809,13 +809,12 @@ int MultiConf::StartSendingVideoSpy(int spyId,char *sendVideoIp,int sendVideoPor
 	//Check particpant
 	if (part)
 		//Set video codec
-		rtp = part->StartSendingVideoSpy(spyId, sendVideoIp, sendVideoPort, rtpMap);
+		ret = part->StartSendingVideoSpy(spyId, sendVideoIp, sendVideoPort, rtpMap);
 
 
 	//Unlock
 	participantsLock.DecUse();
-	if(rtp != NULL)
-		ret = 1;
+
 	//Start sending the video
 	//return ((RTPParticipant*)part)->StartSendingVideo(sendVideoIp,sendVideoPort,rtpMap);
 	return ret;
