@@ -625,7 +625,7 @@ xmlrpc_value* StartSendingVideoSpy(xmlrpc_env *env, xmlrpc_value *param_array, v
 		return xmlerror(env,"Conference does not exist");
 
 	//La borramos
-	int res = conf->StartSendingVideoSpy(spyId,sendVideoIp,sendVideoPort,map) != NULL;
+	int res = conf->StartSendingVideoSpy(spyId,sendVideoIp,sendVideoPort,map);
 
 	//Liberamos la referencia
 	mcu->ReleaseConferenceRef(confId);
