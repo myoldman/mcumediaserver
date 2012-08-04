@@ -435,7 +435,8 @@ int MultiConf::CreateSpy(int spyeeId)
 	//Unlock
 	spysLock.Unlock();
 
-	Log("<CreateSpy [%d]\n",spyeeId);	
+	Log("<CreateSpy [%d]\n",spyeeId);
+	return spyId;
 }
 
 /************************
@@ -552,11 +553,15 @@ int MultiConf::CreateParticipant(int mosaicId,std::wstring name,Participant::Typ
 int MultiConf::DeleteSpy(int spyId)
 {
 	int ret = 0;
-	if(spys.find(spyId) == spys.end())
+	Spys::iterater it = spys.find(spyId);
+	if(it == spys.end())
 		return 0;
 	
+	spysLock.WaitUnusedAndLock();
 	int spyeeId = spys[spyId];	
-
+	spys.erase(it);
+	spysLock.Unlock();
+	
 	Log(">DeleteSpy [%d]\n",spyId);
 
 	//Use list
