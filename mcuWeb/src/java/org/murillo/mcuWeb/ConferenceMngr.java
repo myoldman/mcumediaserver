@@ -1002,7 +1002,14 @@ public class ConferenceMngr implements Conference.Listener, XmlRpcEventManager.L
             //Log
             Logger.getLogger(ConferenceMngr.class.getName()).log(Level.FINEST, "creating spy for confId={0} partId = {1}", new Object[]{ conf.getId(), spy_number});
             Spyer spyer = conf.createSpyer(spy_number, from.getUser());
-            spyer.onInviteRequest(request);
+            if(spyer != null) {
+                spyer.onInviteRequest(request);
+            } else {
+                 //Create final response
+                resp = request.createResponse(500, "spyer create failed");
+                //Send it
+                resp.send();
+            }
         } else {
             //Log
             Logger.getLogger(ConferenceMngr.class.getName()).log(Level.FINEST, "creating participant for confId={0}", conf.getId());
