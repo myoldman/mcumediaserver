@@ -553,7 +553,7 @@ int MultiConf::CreateParticipant(int mosaicId,std::wstring name,Participant::Typ
 int MultiConf::DeleteSpy(int spyId)
 {
 	int ret = 0;
-	Spys::iterater it = spys.find(spyId);
+	Spys::iterator it = spys.find(spyId);
 	if(it == spys.end())
 		return 0;
 	
