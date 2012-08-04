@@ -999,7 +999,7 @@ public class RTPParticipant extends Participant  implements Spyer.Listener {
             if(userName != null)
             {
                 resp.addHeader("username", userName);
-                resp.addHeader("userid", userId);
+                resp.addHeader("userid", id.toString());
             }
             resp.setHeader("confUid", conf.getUID());
             //Send it
@@ -1132,7 +1132,7 @@ public class RTPParticipant extends Participant  implements Spyer.Listener {
         if(userName != null)
         {
             inviteRequest.addHeader("username", userName);
-            inviteRequest.addHeader("userid", userId);
+            inviteRequest.addHeader("userid", id.toString());
         }
         inviteRequest.setHeader("confUid", conf.getUID());
         //Send it
