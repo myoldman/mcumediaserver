@@ -573,7 +573,7 @@ int MultiConf::DeleteSpy(int spyId)
 	participantsLock.DecUse();
 	
 
-	Log("<DeleteSpy [%d]\n",id);
+	Log("<DeleteSpy [%d]\n",spyId);
 
 	return 1;
 }
@@ -795,6 +795,7 @@ int MultiConf::SetVideoCodec(int id,int codec,int mode,int fps,int bitrate,int q
 int MultiConf::StartSendingVideoSpy(int spyId,char *sendVideoIp,int sendVideoPort,VideoCodec::RTPMap& rtpMap)
 {
 	int ret = 0;
+	RTPSession *rtp = NULL;
 	if(spys.find(spyId) == spys.end())
 		return 0;
 	
@@ -808,14 +809,16 @@ int MultiConf::StartSendingVideoSpy(int spyId,char *sendVideoIp,int sendVideoPor
 	//Check particpant
 	if (part)
 		//Set video codec
-		ret = part->StartSendingVideoSpy(spyId, rtpMap);
+		rtp = part->StartSendingVideoSpy(spyId, sendVideoIp, sendVideoPort, rtpMap);
 
 
 	//Unlock
 	participantsLock.DecUse();
+	if(rtp != NULL)
+		ret = 1;
 	//Start sending the video
 	//return ((RTPParticipant*)part)->StartSendingVideo(sendVideoIp,sendVideoPort,rtpMap);
-	return rtp;
+	return ret;
 
 }
 
