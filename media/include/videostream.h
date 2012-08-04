@@ -42,7 +42,7 @@ public:
 	int SetParticipant(RTPParticipant *participant);
 	//VideoMediaSubsession* GetVideoMediaSubsession() { return videoSubsession;}
 	//void SetVideoMediaSubsession(VideoMediaSubsession* videoSubsession) { this->videoSubsession = videoSubsession;}
-	RTPSession *InitVideoWatcher(unsigned clientSessionId);
+	RTPSession *InitVideoWatcher(unsigned clientSessionId, VideoCodec::RTPMap& rtpMap);
 	RTPSession *AddVideoWatcher(unsigned clientSessionId,char *sendVideoIp,int sendVideoPort,VideoCodec::RTPMap& rtpMap, VideoCodec::Type watcherCodec);
 	int DeleteVideoWatcher(unsigned clientSessionId);
 	VideoCodec::Type GetDecodeCodec(){return decodeCodec;};
