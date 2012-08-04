@@ -16,7 +16,7 @@ public:
 	virtual int GetWidth()	{return ctx->width;};
 	virtual int GetHeight()	{return ctx->height;};
 	// add for rtsp watcher by liuhong start
-	virtual int GetFPS() {return round(1 / av_q2d(ctx->time_base))/2;};
+	virtual int GetFPS() {return (int)round(1 / av_q2d(ctx->time_base))/2;};
 	virtual BYTE* GetFrame(){return (BYTE *)frame;};
 	virtual DWORD GetFrameSize(){return frameSize;};
 	virtual int GetBitRate(){return ctx->bit_rate;};
