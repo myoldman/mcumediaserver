@@ -237,6 +237,10 @@ public abstract class Participant implements Serializable {
                 if (state == State.DISCONNECTED) {
                     this.admin = false;
                     conf.changeAdmin(id);
+                    for(Spyer spyer : spyers.values()){
+                        spyer.end();
+                    }
+                    spyers.clear();
                     //SipEndPointManager.INSTANCE.setSipEndPointStateByNumber(this.getUsername(), com.ffcs.mcu.pojo.EndPoint.State.DISCONNECTED);
                 }
                 if (state != State.CREATED && state != State.DESTROYED) {
@@ -380,6 +384,9 @@ public abstract class Participant implements Serializable {
         return json;
     }
 
+    public void AddSpyer(Spyer spyer){
+        spyers.put(spyer.getSpyer_number(), spyer);
+    }
     public Spyer GetSpyer(Integer spyer){
         return spyers.get(spyer);
     }

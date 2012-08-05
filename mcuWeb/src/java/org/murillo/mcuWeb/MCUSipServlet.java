@@ -44,7 +44,11 @@ public class MCUSipServlet extends SipServlet implements SipSessionListener, Sip
         //Get session
         SipSession session = resp.getSession();
         //Get Participant
-        RTPParticipant part = (RTPParticipant) session.getAttribute("user");
+        Object obj =  session.getAttribute("user");
+        if (obj instanceof Spyer) {
+            return;
+        }
+        RTPParticipant part = (RTPParticipant)obj;
         //If not found
         if (part == null) {
             Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "doResponse without participant [idSession:{0},method:{1},from:{2}]", new Object[]{session.getId(), resp.getMethod(), session.getRemoteParty().toString()});

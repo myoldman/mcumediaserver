@@ -1420,10 +1420,6 @@ public class RTPParticipant extends Participant  implements Spyer.Listener {
         //Set state
         setState(State.DESTROYED);
         conf.getMixer().releaseMcuClient(client);
-        for(Spyer spyer : spyers.values()){
-            spyer.end();
-        }
-        spyers.clear();
     }
 
     public void startSending() throws XmlRpcException {

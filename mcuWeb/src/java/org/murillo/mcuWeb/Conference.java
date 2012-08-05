@@ -354,6 +354,7 @@ public class Conference implements Participant.Listener {
                     spy.addSupportedCodec(media.getKey(), codec);
                 }
             }
+            part.AddSpyer(spy);
             spy.setListener(part);
             return spy;
         } catch (XmlRpcException ex) {
