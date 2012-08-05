@@ -21,39 +21,13 @@ import org.murillo.MediaServer.XmlRpcMcuClient.MediaStatistics;
 import org.murillo.mcuWeb.Conference;
 import org.murillo.mcuWeb.Participant;
 import org.murillo.mcuWeb.Profile;
+import org.murillo.mcuWeb.RTPParticipant;
 
 /**
  *
  * @author liuhong
  */
 public class Spyer {
-
-    public void onTimeout() {
-        if (state == State.CONNECTED) {
-            //Extend session two minutes
-            appSession.setExpires(1);
-            //Get statiscits
-            stats = conf.getParticipantStats(spyee.getId());
-            //Calculate acumulated packets
-            Integer num = 0;
-            //For each media
-            for (MediaStatistics s : stats.values()) //Increase packet count
-            {
-                num += s.numRecvPackets;
-            }
-            //Check
-            if (!num.equals(totalPacketCount)) {
-                //Update
-                totalPacketCount = num;
-            } else {
-                //Terminate
-                error(State.TIMEOUT, "TIMEOUT");
-            }
-        } else {
-            //Teminate
-            destroy();
-        }
-    }
 
     public interface Listener {
 
@@ -178,6 +152,7 @@ public class Spyer {
         state = State.CREATED;
         isSendingVideo = false;
         supportedCodecs = new HashMap<String, List<Integer>>();
+        videoBitrate = 0;
         //Create the client
         this.client = conf.getMixer().createMcuClient();
 
@@ -876,6 +851,7 @@ public class Spyer {
         }
         //Set state
         setState(State.DESTROYED);
+        spyee = null;
         conf.getMixer().releaseMcuClient(client);
     }
 
@@ -925,5 +901,50 @@ public class Spyer {
         setState(State.DISCONNECTED);
         //Terminate
         destroy();
+    }
+
+    public void onTimeout() {
+        if (state == State.CONNECTED) {
+            //Extend session two minutes
+            appSession.setExpires(1);
+            //Get statiscits
+            stats = conf.getParticipantStats(spyee.getId());
+            //Calculate acumulated packets
+            Integer num = 0;
+            //For each media
+            for (MediaStatistics s : stats.values()) //Increase packet count
+            {
+                num += s.numRecvPackets;
+            }
+            //Check
+            if (!num.equals(totalPacketCount)) {
+                //Update
+                totalPacketCount = num;
+            } else {
+                //Terminate
+                error(State.TIMEOUT, "TIMEOUT");
+            }
+        } else {
+            //Teminate
+            destroy();
+        }
+    }
+
+    public void onInfoRequest(SipServletRequest request) throws IOException {
+        //Check content type
+        if (request.getContentType().equals("application/media_control+xml"))
+        {
+            //Send FPU
+            if(spyee != null)
+                ((RTPParticipant)spyee).sendFPU();
+            //Send OK
+            SipServletResponse req = request.createResponse(200, "OK");
+            //Send it
+            req.send();
+        } else {
+            SipServletResponse req = request.createResponse(500, "Not supported");
+            //Send it
+            req.send();
+        }
     }
 }

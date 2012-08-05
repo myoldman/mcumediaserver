@@ -1605,6 +1605,7 @@ int MultiConf::SendFPU(int partId)
 	{
 		Log("-RequestFPU [id:%d]\n",m_CurrentBroadCaster);
 		listener->onParticipantRequestFPU(this,m_CurrentBroadCaster,this->param);
+		listener->onParticipantRequestFPU(this,partId,this->param);
 	}
 	//Unlock
 	participantsLock.DecUse();

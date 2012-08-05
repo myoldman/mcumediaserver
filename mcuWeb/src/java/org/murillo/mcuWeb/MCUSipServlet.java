@@ -38,8 +38,7 @@ public class MCUSipServlet extends SipServlet implements SipSessionListener, Sip
     private static final long serialVersionUID = 3978425801979081269L;
 
     @Override
-    protected void doResponse(SipServletResponse resp) throws ServletException, IOException
-    {
+    protected void doResponse(SipServletResponse resp) throws ServletException, IOException {
         //Super processing
         super.doResponse(resp);
         //Get session
@@ -47,44 +46,43 @@ public class MCUSipServlet extends SipServlet implements SipSessionListener, Sip
         //Get Participant
         RTPParticipant part = (RTPParticipant) session.getAttribute("user");
         //If not found
-        if (part==null)
-        {
-            Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "doResponse without participant [idSession:{0},method:{1},from:{2}]",new Object[]{session.getId(),resp.getMethod(),session.getRemoteParty().toString()});
+        if (part == null) {
+            Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "doResponse without participant [idSession:{0},method:{1},from:{2}]", new Object[]{session.getId(), resp.getMethod(), session.getRemoteParty().toString()});
             //Try from the application session
             part = (RTPParticipant) session.getApplicationSession().getAttribute("user");
             //If not found
-            if (part==null)
-            {
+            if (part == null) {
                 //Log
-                 Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "doResponse without participant [idAppSession:{0}]",new Object[]{session.getApplicationSession().getId()});
-            //exit
-            return;
-        }
+                Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "doResponse without participant [idAppSession:{0}]", new Object[]{session.getApplicationSession().getId()});
+                //exit
+                return;
+            }
             //Set it to the session also
             session.setAttribute("user", part);
         }
         //Check participant
-        if (part==null)
-            //Exit
+        if (part == null) //Exit
+        {
             return;
+        }
         //Check methods
-        if (resp.getMethod().equals("INFO"))
+        if (resp.getMethod().equals("INFO")) {
             part.onInfoResponse(resp);
-        else if (resp.getMethod().equals("INVITE"))
+        } else if (resp.getMethod().equals("INVITE")) {
             part.onInviteResponse(resp);
-        else if (resp.getMethod().equals("BYE"))
+        } else if (resp.getMethod().equals("BYE")) {
             part.onByeResponse(resp);
-        else if (resp.getMethod().equals("CANCEL"))
+        } else if (resp.getMethod().equals("CANCEL")) {
             part.onCancelResponse(resp);
+        }
     }
 
     @Override
-    protected void doOptions(SipServletRequest request) throws IOException
-    {
+    protected void doOptions(SipServletRequest request) throws IOException {
         //Get Participant
         RTPParticipant part = (RTPParticipant) request.getSession().getAttribute("user");
         //Check participant
-        if (part!=null) {
+        if (part != null) {
             //Handle it
             part.onOptionsRequest(request);
         } else {
@@ -96,10 +94,8 @@ public class MCUSipServlet extends SipServlet implements SipSessionListener, Sip
     }
 
     @Override
-    protected void doInvite(SipServletRequest request) throws IOException
-    {
-        if (request.isInitial())
-        {
+    protected void doInvite(SipServletRequest request) throws IOException {
+        if (request.isInitial()) {
             //Retreive the servlet context
             ServletContext context = getServletContext();
             //Get Manager
@@ -109,46 +105,54 @@ public class MCUSipServlet extends SipServlet implements SipSessionListener, Sip
         }
     }
 
-   @Override
-    protected void doBye(SipServletRequest request) throws ServletException, IOException
-    {
-         Object obj = request.getSession().getAttribute("user");
-        if(obj instanceof Spyer) {
+    @Override
+    protected void doBye(SipServletRequest request) throws ServletException, IOException {
+        Object obj = request.getSession().getAttribute("user");
+        if (obj instanceof Spyer) {
             Spyer spy = (Spyer) obj;
             spy.onByeRequest(request);
         } else {
             RTPParticipant part = (RTPParticipant) obj;
             //Check participant
-            if (part!=null)
-                //Handle it
+            if (part != null) //Handle it
+            {
                 part.onByeRequest(request);
+            }
         }
     }
-   
+
     @Override
     protected void doAck(SipServletRequest request) throws ServletException, IOException {
         //Get Participant
         Object obj = request.getSession().getAttribute("user");
-        if(obj instanceof Spyer) {
+        if (obj instanceof Spyer) {
             Spyer spy = (Spyer) obj;
             spy.onAckRequest(request);
         } else {
             RTPParticipant part = (RTPParticipant) obj;
             //Check participant
-            if (part!=null)
-                //Handle it
+            if (part != null) //Handle it
+            {
                 part.onAckRequest(request);
+            }
         }
     }
 
     @Override
     protected void doInfo(SipServletRequest request) throws ServletException, IOException {
         //Get Participant
-        RTPParticipant part = (RTPParticipant) request.getSession().getAttribute("user");
-        //Check participant
-        if (part!=null)
-            //Handle it
-            part.onInfoRequest(request);
+        Object obj = request.getSession().getAttribute("user");
+        if (obj instanceof Spyer) {
+            Spyer spy = (Spyer) obj;
+            spy.onInfoRequest(request);
+        } else {
+            RTPParticipant part = (RTPParticipant) obj;
+            //Check participant
+            if (part != null) //Handle it
+            {
+                part.onInfoRequest(request);
+            }
+        }
     }
 
     @Override
@@ -156,9 +160,10 @@ public class MCUSipServlet extends SipServlet implements SipSessionListener, Sip
         //Get Participant
         RTPParticipant part = (RTPParticipant) request.getSession().getAttribute("user");
         //Check participant
-        if (part!=null)
-            //Handle it
+        if (part != null) //Handle it
+        {
             part.onCancelRequest(request);
+        }
     }
 
     @Override
@@ -173,7 +178,7 @@ public class MCUSipServlet extends SipServlet implements SipSessionListener, Sip
             return;
         }
         String expiresStr = request.getHeader("Expires");
-        if(expiresStr == null) {
+        if (expiresStr == null) {
             expiresStr = addr.getParameter("expires");
         }
         int expires = (expiresStr != null) ? Integer.parseInt(expiresStr) : 0;
@@ -201,7 +206,7 @@ public class MCUSipServlet extends SipServlet implements SipSessionListener, Sip
                 SipEndPoint sipEp = sipEndPointManager.getSipEndPoint(uid);
                 resp.addHeader("username", sipEp.getName());
                 resp.addHeader("userid", String.valueOf(sipEp.getId()));
-                if(sipEp.getState() == State.NOTREGISTER) {
+                if (sipEp.getState() == State.NOTREGISTER) {
                     sipEp.setState(State.IDLE);
                 }
                 sipEndPointManager.getSipEndPoint(uid).setSipUri(sipURI);
@@ -239,11 +244,10 @@ public class MCUSipServlet extends SipServlet implements SipSessionListener, Sip
     public void sessionDestroyed(SipSessionEvent event) {
         //Log it       
         Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "sessionDestroyed!");
-   }
+    }
 
-    public void sessionReadyToInvalidate(SipSessionEvent event)
-    {
-       //Log it
+    public void sessionReadyToInvalidate(SipSessionEvent event) {
+        //Log it
         Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "sessionReadyToInvalidate!");
     }
 
@@ -259,17 +263,18 @@ public class MCUSipServlet extends SipServlet implements SipSessionListener, Sip
         Logger.getLogger(this.getClass().getName()).log(java.util.logging.Level.WARNING, "sessionExpired!");
         //Get application session
         SipApplicationSession applicationSession = sase.getApplicationSession();
-        
+
         Object obj = applicationSession.getAttribute("user");
-        if(obj instanceof Spyer) {
+        if (obj instanceof Spyer) {
             Spyer spy = (Spyer) obj;
             spy.onTimeout();
         } else {
             RTPParticipant part = (RTPParticipant) obj;
             //Check participant
-            if (part!=null)
-                //Handle it
+            if (part != null) //Handle it
+            {
                 part.onTimeout();
+            }
         }
     }
 
