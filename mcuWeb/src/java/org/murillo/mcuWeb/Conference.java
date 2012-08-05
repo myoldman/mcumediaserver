@@ -351,7 +351,7 @@ public class Conference implements Participant.Listener {
             {
                 for (Integer codec : media.getValue()) //Add media codec
                 {
-                    ((RTPParticipant) part).addSupportedCodec(media.getKey(), codec);
+                    spy.addSupportedCodec(media.getKey(), codec);
                 }
             }
             spy.setListener(part);
@@ -620,7 +620,7 @@ public class Conference implements Participant.Listener {
         part.end();
     }
 
-    Map<String, MediaStatistics> getParticipantStats(Integer partId) {
+    public Map<String, MediaStatistics> getParticipantStats(Integer partId) {
         try {
             //Get them
             return client.getParticipantStatistics(id, partId);

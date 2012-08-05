@@ -19,6 +19,7 @@
 package org.murillo.mcuWeb;
 
 import com.ffcs.mcu.SipEndPointManager;
+import com.ffcs.mcu.Spyer;
 import com.ffcs.mcu.pojo.EndPoint.State;
 import com.ffcs.mcu.pojo.SipEndPoint;
 import java.io.IOException;
@@ -111,22 +112,33 @@ public class MCUSipServlet extends SipServlet implements SipSessionListener, Sip
    @Override
     protected void doBye(SipServletRequest request) throws ServletException, IOException
     {
-        //Get Participant
-        RTPParticipant part = (RTPParticipant) request.getSession().getAttribute("user");
-        //Check participant
-        if (part!=null)
-            //Handle it
-            part.onByeRequest(request);
+         Object obj = request.getSession().getAttribute("user");
+        if(obj instanceof Spyer) {
+            Spyer spy = (Spyer) obj;
+            spy.onByeRequest(request);
+        } else {
+            RTPParticipant part = (RTPParticipant) obj;
+            //Check participant
+            if (part!=null)
+                //Handle it
+                part.onByeRequest(request);
+        }
     }
    
     @Override
     protected void doAck(SipServletRequest request) throws ServletException, IOException {
         //Get Participant
-        RTPParticipant part = (RTPParticipant) request.getSession().getAttribute("user");
-        //Check participant
-        if (part!=null)
-            //Handle it
-            part.onAckRequest(request);
+        Object obj = request.getSession().getAttribute("user");
+        if(obj instanceof Spyer) {
+            Spyer spy = (Spyer) obj;
+            spy.onAckRequest(request);
+        } else {
+            RTPParticipant part = (RTPParticipant) obj;
+            //Check participant
+            if (part!=null)
+                //Handle it
+                part.onAckRequest(request);
+        }
     }
 
     @Override
@@ -247,12 +259,18 @@ public class MCUSipServlet extends SipServlet implements SipSessionListener, Sip
         Logger.getLogger(this.getClass().getName()).log(java.util.logging.Level.WARNING, "sessionExpired!");
         //Get application session
         SipApplicationSession applicationSession = sase.getApplicationSession();
-        //Get user
-        RTPParticipant part = (RTPParticipant) applicationSession.getAttribute("user");
-        //Check if we have participant
-        if (part!=null)
-            //Timeout
-            part.onTimeout();
+        
+        Object obj = applicationSession.getAttribute("user");
+        if(obj instanceof Spyer) {
+            Spyer spy = (Spyer) obj;
+            spy.onTimeout();
+        } else {
+            RTPParticipant part = (RTPParticipant) obj;
+            //Check participant
+            if (part!=null)
+                //Handle it
+                part.onTimeout();
+        }
     }
 
     public void sessionReadyToInvalidate(SipApplicationSessionEvent sase) {

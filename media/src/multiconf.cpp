@@ -663,7 +663,7 @@ void MultiConf:: DestroyParticipant(int partId,Participant* part)
 	audioMixer.DeleteMixer(partId);
 	textMixer.DeleteMixer(partId);
 	m_GroupVideo.StopSending(partId);
-	m_GroupAudio.StopSending(partId);
+	//m_GroupAudio.StopSending(partId);
 	//Delete participant
 	delete part;
 

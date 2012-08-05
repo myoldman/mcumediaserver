@@ -17,6 +17,7 @@ import javax.servlet.sip.*;
 import org.apache.xmlrpc.XmlRpcException;
 import org.murillo.MediaServer.Codecs;
 import org.murillo.MediaServer.XmlRpcMcuClient;
+import org.murillo.MediaServer.XmlRpcMcuClient.MediaStatistics;
 import org.murillo.mcuWeb.Conference;
 import org.murillo.mcuWeb.Participant;
 import org.murillo.mcuWeb.Profile;
@@ -27,6 +28,33 @@ import org.murillo.mcuWeb.Profile;
  */
 public class Spyer {
 
+    public void onTimeout() {
+        if (state == State.CONNECTED) {
+            //Extend session two minutes
+            appSession.setExpires(1);
+            //Get statiscits
+            stats = conf.getParticipantStats(spyee.getId());
+            //Calculate acumulated packets
+            Integer num = 0;
+            //For each media
+            for (MediaStatistics s : stats.values()) //Increase packet count
+            {
+                num += s.numRecvPackets;
+            }
+            //Check
+            if (!num.equals(totalPacketCount)) {
+                //Update
+                totalPacketCount = num;
+            } else {
+                //Terminate
+                error(State.TIMEOUT, "TIMEOUT");
+            }
+        } else {
+            //Teminate
+            destroy();
+        }
+    }
+
     public interface Listener {
 
         public void onStateChanged(Spyer part, Spyer.State state);
@@ -36,6 +64,7 @@ public class Spyer {
 
         CREATED, CONNECTING, WAITING_ACCEPT, CONNECTED, ERROR, TIMEOUT, BUSY, DECLINED, NOTFOUND, DISCONNECTED, DESTROYED
     }
+    private Map<String, MediaStatistics> stats;
     private Address address;
     private String name;
     private SipSession session = null;
@@ -68,6 +97,7 @@ public class Spyer {
     private String recIp;
     protected Profile profile;
     private boolean isSendingVideo;
+    private Integer totalPacketCount;
 
     public HashMap<Integer, Integer> getRtpInMediaMap(String media) {
         //Return rtp mapping for media
@@ -139,6 +169,8 @@ public class Spyer {
         //Create listeners
         listeners = new HashSet<Listener>();
         rejectedMedias = "";
+        videoContentType = "";
+        h264profileLevelId = "";
         h264packetization = 0;
         rtpInMediaMap = new HashMap<String, HashMap<Integer, Integer>>();
         rtpOutMediaMap = new HashMap<String, HashMap<Integer, Integer>>();
